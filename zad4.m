@@ -11,6 +11,13 @@ D = 90
 M = zeros(N,Nu)
 Mp = zeros(N,D-1)
 s = step(Gz,0:Tp:100)
+K =2.538000000000000;
+T0 = 5
+T1= 1.78
+T2 = 5.13
+Tp = 0.5
+Gs = tf(K,[T1*T2, T1+T2, 1],'IODelay',T0)
+Gz = c2d(Gs,Tp,"zoh")
 kk=1000
 u(1:D-1)=0; y(1:D-1)=0;
 yzad(1:D-1)=0; yzad(D:kk)=1;
@@ -28,7 +35,7 @@ for i = 1:N
         Mp(i,j) = s(i+j) - s(j);
     end
 end
-lambda = 969;
+lambda = 1;
 Gamma = eye(N,N)
 Alpha = eye(Nu,Nu) * lambda;
 
