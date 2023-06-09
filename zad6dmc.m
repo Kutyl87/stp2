@@ -17,7 +17,7 @@ u(1:kk)=0; y(1:kk)=0;
 yzad(1:kk)=0; yzad(abs(-2- T0 *(1/Tp))+1:kk)=1;
 e(1:kk)=0;
 T0_prop = [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2];
-K_prop = [];
+K_prop_dmc = [];
 lambda = 1;
 Gamma = eye(N,N);
 k_start = 1000;
@@ -31,7 +31,7 @@ for x= 1 : size(T0_prop,2)
     right_max = 0;
     left_min = 0
     right_min = 0
-    while (left_max*1.001>= right_max && left_min<= right_min*1.001)  || k_start >800
+    while ((left_max*1.001>= right_max & left_min<= right_min*1.001)  | k_start >800)
         k_start = 900;
         K_t = K_base*z;
         Gs = tf(K_t,[T1*T2, T1+T2, 1],'IODelay',T0);
@@ -81,15 +81,11 @@ for x= 1 : size(T0_prop,2)
     dU = K*(Yzadk - Yk - Mp * dUp);
     u(k)= dU(1) + u(k-1);
     end
-    z = z+0.01
-    left_max = max(y(k_start+1:min(k_start+78,1000)));
-    left_min = min(y(k_start+1:min(k_start+78,1000)));
+    z = z+0.001
+    left_max = max(y(k_start+1:min(k_start+100,1000)));
+    left_min = min(y(k_start+1:min(k_start+100,1000)));
     right_max = max(y(800:1000));
     right_min = min(y(800:1000));
     end
-    K_prop = [K_prop, z];
+    K_prop_dmc = [K_prop_dmc, z];
 end
-t = linspace(1,kk,kk);
-stairs(t,u,'LineWidth',1.5, Color='r');
-hold on
-stairs(t,y,'LineWidth',1.5); 

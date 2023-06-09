@@ -13,7 +13,7 @@ Td = 1.94;
 T_0base = 5;
 K_base = 4.7
 T0_prop = [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2];
-K_prop = [];
+K_prop_pid = [];
 for j= 1 : size(T0_prop,2)
     T0 = T_0base * T0_prop(j);
     r1 = Kp*((Tp/(2*Ti)) -2 *(Td/Tp) -1);
@@ -45,5 +45,5 @@ for j= 1 : size(T0_prop,2)
         left_max = max(u(200:400));
         right_max = max(u(800:1000));
     end
-    K_prop = [K_prop, i];
+    K_prop_pid = [K_prop_pid, i];
 end

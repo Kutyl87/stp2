@@ -5,8 +5,8 @@ T2 = 5.13
 Tp = 0.5
 Gs = tf(K,[T1*T2, T1+T2, 1],'IODelay',T0)
 Gz = c2d(Gs,Tp,"zoh")
-N = 22
-Nu = 2
+N = 90
+Nu = 90
 D = 90
 M = zeros(N,Nu)
 Mp = zeros(N,D-1)
@@ -23,12 +23,12 @@ for i= 1:N
     end
 end
 
-for i = 1:N
-    for j = 1:D-1
-        Mp(i,j) = s(i+j) - s(j);
-    end
-end
-lambda = 969;
+% for i = 1:N
+%     for j = 1:D-1
+%         Mp(i,j) = s(i+j) - s(j);
+%     end
+% end
+lambda = 1;
 Gamma = eye(N,N)
 Alpha = eye(Nu,Nu) * lambda;
 
@@ -41,24 +41,49 @@ du = zeros(0:12)
 
 
 a1 = Gz.Denominator{1}(2)
-a0 = Gz.Denominator{1}(3)
-b1 = Gz.Numerator{1}(2)
-b0 = Gz.Numerator{1}(3)
+a2 = Gz.Denominator{1}(3)
+b11 = Gz.Numerator{1}(2)
+b12 = Gz.Numerator{1}(3)
+coeffs_b = [zeros(1,10),b11,b12];
+coeffs_a = [a1,a2];
 counter = 2
+predicted_y = 0;
 for k=D:kk
  dUp = []
- y(k)=b1*u(k-1- T0 *(1/Tp))+b0*u(k-2- T0 *(1/Tp))-a1*y(k-1)-a0*y(k-2);
+ y(k)=b11*u(k-1- T0 *(1/Tp))+b12*u(k-2- T0 *(1/Tp))-a1*y(k-1)-a2*y(k-2);
  e(k)=yzad(k)-y(k);
  Yzadk = yzad(k) *ones(N,1);
- Yk = y(k) *ones(N,1);
- for i=1:D-1
-     if (k-i-1) > 0
-        dUp = [dUp;u(k-i) - u(k-i-1)];
-     else
-        dUp = [dUp;u(k-i)]
+ Y0 = [];
+ d(k) = y(k) - predicted_y;
+ for p=1:N
+     N_un = min(p,abs(-1- T0 *(1/Tp)));
+     N_y = min(p-1,2);
+     y0_pr = 0;
+     for j=1:N_un
+         y0_pr = y0_pr + coeffs_b(j)*u(k-1);
      end
+     for j=N_un+1:abs(-2- T0 *(1/Tp))
+         y0_pr = y0_pr + coeffs_b(j)*u(k-1);
+     end
+     for j=1:N_y
+         y0_pr = y0_pr -coeffs_a(j)*Y0(end-j);
+     end
+     for j=N_y+1:2
+         y0_pr = y0_pr - coeffs_a(j)*y(k-j+p);
+     end
+     y0_pr = y0_pr + d(k);
+     predicted_y
  end
- dU = K*(Yzadk - Yk - Mp * dUp)
+
+
+ % for i=1:D-1
+ %     if (k-i-1) > 0
+ %        dUp = [dUp;u(k-i) - u(k-i-1)];
+ %     else
+ %        dUp = [dUp;u(k-i)]
+ %     end
+ % end
+ dU = K*(Yzadk - Y0)
  u(k)= dU(1) + u(k-1);
  if mod(k,2*D-1) == 0
     yzad(k+1:kk)= (1 - min(yzad(k),1))*counter
