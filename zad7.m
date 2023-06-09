@@ -5,8 +5,8 @@ T2 = 5.13;
 Tp = 0.5;
 Gs = tf(K,[T1*T2, T1+T2, 1],'IODelay',T0);
 Gz = c2d(Gs,Tp,"zoh");
-N = 90;
-Nu = 90;
+N = 30;
+Nu = 30;
 D = 90;
 M = zeros(N,Nu);
 Mp = zeros(N,D-1);
@@ -22,12 +22,6 @@ for i= 1:N
         end
     end
 end
-
-% for i = 1:N
-%     for j = 1:D-1
-%         Mp(i,j) = s(i+j) - s(j);
-%     end
-% end
 lambda = 1;
 Gamma = eye(N,N);
 Alpha = eye(Nu,Nu) * lambda;
@@ -48,7 +42,7 @@ coeffs_b = [zeros(1,10),b11,b12];
 coeffs_a = [a1,a2];
 counter = 2;
 predicted_y = 0;
-d= zeros(N);
+d= zeros(N,1);
 for k=D:kk
  dUp = [];
  y(k)=b11*u(k-1- T0 *(1/Tp))+b12*u(k-2- T0 *(1/Tp))-a1*y(k-1)-a2*y(k-2);
@@ -64,7 +58,7 @@ for k=D:kk
          y0_pr = y0_pr + coeffs_b(j)*u(k-1);
      end
      for j=N_un+1:abs(-2- T0 *(1/Tp))
-         y0_pr = y0_pr + coeffs_b(j)*u(k-1);
+         y0_pr = y0_pr + coeffs_b(j)*u(k-j+p);
      end
      for j=1:N_y
          y0_pr = y0_pr -coeffs_a(j)*Y0(end-j+1);
@@ -72,7 +66,7 @@ for k=D:kk
      for j=N_y+1:2
          y0_pr = y0_pr - coeffs_a(j)*y(k-j+p);
      end
-     y0_pr = y0_pr + d(k);
+     y0_pr = y0_pr + d(k,1);
      Y0 = [Y0,y0_pr];
  end
  predicted_y = Y0(1);
@@ -84,12 +78,12 @@ for k=D:kk
  %        dUp = [dUp;u(k-i)]
  %     end
  % end
- dU = K*(Yzadk - Y0);
+ dU = K*(Yzadk - Y0');
  u(k)= dU(1) + u(k-1);
- % if mod(k,2*D-1) == 0
- %    yzad(k+1:kk)= (1 - min(yzad(k),1))*counter;
- %    counter=counter+1;
- % end 
+ if mod(k,2*D-1) == 0
+    yzad(k+1:kk)= (1 - min(yzad(k),1))*counter;
+    counter=counter+1;
+ end 
 
 end
 t = linspace(1,kk,kk);

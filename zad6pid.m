@@ -11,7 +11,7 @@ Kp = 0.18;
 Ti = 7.95;
 Td = 1.94;
 T_0base = 5;
-K_base = 4.7
+K_base = 4.7;
 T0_prop = [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2];
 K_prop_pid = [];
 for j= 1 : size(T0_prop,2)
@@ -40,7 +40,7 @@ for j= 1 : size(T0_prop,2)
          y(k)=b1*u(k-1- T0 *(1/Tp))+b0*u(k-2- T0 *(1/Tp))-a1*y(k-1)-a0*y(k-2);
          e(k)=yzad(k)-y(k);
          u(k)=r2*e(k-2)+r1*e(k-1)+r0*e(k)+u(k-1);
-        end;
+        end
         i = i+0.001;
         left_max = max(u(200:400));
         right_max = max(u(800:1000));
