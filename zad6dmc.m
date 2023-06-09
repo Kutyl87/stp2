@@ -20,15 +20,19 @@ T0_prop = [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2];
 K_prop = [];
 lambda = 1;
 Gamma = eye(N,N);
+k_start = 1000;
 Alpha = eye(Nu,Nu) * lambda;
+left_min = 0
+right_min = 0
 for x= 1 : size(T0_prop,2)
     T0 = T_0base * T0_prop(x);
-    z = 1;
+    z = 0.01;
     left_max = 0;
     right_max = 0;
-    coeff = -1;
-    while left_max>= right_max
-        k_start = 0;
+    left_min = 0
+    right_min = 0
+    while (left_max*1.001>= right_max && left_min<= right_min*1.001)  || k_start >800
+        k_start = 900;
         K_t = K_base*z;
         Gs = tf(K_t,[T1*T2, T1+T2, 1],'IODelay',T0);
         Gz = c2d(Gs,Tp,"zoh");
@@ -60,7 +64,7 @@ for x= 1 : size(T0_prop,2)
      dUp = [];
      y(k)=b1*u(k-1- T0 *(1/Tp))+b0*u(k-2- T0 *(1/Tp))-a1*y(k-1)-a0*y(k-2);
      e(k)=yzad(k)-y(k);
-     if (y(k) >= yzad(k)) && k_start == 0
+     if (y(k) >= yzad(k)) && k_start == 900
         % disp(y(k))
         % disp(yzad(k))
         k_start = k;
@@ -77,14 +81,15 @@ for x= 1 : size(T0_prop,2)
     dU = K*(Yzadk - Yk - Mp * dUp);
     u(k)= dU(1) + u(k-1);
     end
-    if z==0
-        coeff = 1;
-    end
-    z = z+(0.01)*coeff;
-    left_max = max(u(k_start:k_start+100));
-    right_max = max(u(800:1000));
+    z = z+0.01
+    left_max = max(y(k_start+1:min(k_start+78,1000)));
+    left_min = min(y(k_start+1:min(k_start+78,1000)));
+    right_max = max(y(800:1000));
+    right_min = min(y(800:1000));
     end
     K_prop = [K_prop, z];
 end
 t = linspace(1,kk,kk);
 stairs(t,u,'LineWidth',1.5, Color='r');
+hold on
+stairs(t,y,'LineWidth',1.5); 
