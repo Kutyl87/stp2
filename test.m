@@ -3,7 +3,7 @@ y = [2 4 1 3 5];  % Przykładowy wektor y
 stairs(x, y);  % Tworzenie wykresu typu stairs
 
 % Znalezienie indeksu dla punktu x = 3
-index = find(x == 3);
+index = find(x == 2);
 
 % Wysokość schodka w punkcie x = 3
-difference = y(index) - y(index-1);
+difference = y(index)
