@@ -1,17 +1,25 @@
+%%Parametry równania transmitancji
 K =4.7;
-T0 = 5
-T1= 1.78
-T2 = 5.13
-Tp = 0.5
-Gs = tf(K,[T1*T2, T1+T2, 1],'IODelay',T0)
-Gz = c2d(Gs,Tp,"zoh")
-N = 22
-Nu = 2
-D = 90
-M = zeros(N,Nu)
-Mp = zeros(N,D-1)
-s = step(Gz,0:Tp:100)
-kk=1000
+T0 = 5;
+T1= 1.78;
+T2 = 5.13;
+Tp = 0.5;
+Gs = tf(K,[T1*T2, T1+T2, 1],'IODelay',T0);
+Gz = c2d(Gs,Tp,"zoh");
+
+%% Parametry regulatora DMC
+N = 22;
+Nu = 2;
+D = 90;
+
+%%Inicjacja macierzy M i Mp
+M = zeros(N,Nu);
+Mp = zeros(N,D-1);
+
+%%Wyznaczenie współczynników odpowiedzi skokowej
+s = step(Gz,0:Tp:100);
+kk=1000;
+%%Inicjalizacja wektorów
 u(1:D-1)=0; y(1:D-1)=0;
 yzad(1:D-1)=0; yzad(D:kk)=1;
 e(1:D-1)=0;
