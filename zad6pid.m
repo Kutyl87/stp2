@@ -1,8 +1,9 @@
-coeff = 0;
+%% Inicjalizacja wektorów do pętli regulacji
 kk=1000; 
 u(1:kk)=0; y(1:kk)=0;
 yzad(1:kk)=0; yzad(13:kk)=1;
 e(1:kk)=0;
+%% Parametry regulatora i transmitancji
 T0 = 5;
 T1= 1.78;
 T2 = 5.13;
@@ -12,8 +13,11 @@ Ti = 7.95;
 Td = 1.94;
 T_0base = 5;
 K_base = 4.7;
+%% Inicjalizacja wektorów do pętli do szukania granicy obszaru stabilności
 T0_prop = [1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2];
 K_prop_pid = [];
+
+%% Główna pętla do poszukiwania granicy stabilności
 for j= 1 : size(T0_prop,2)
     T0 = T_0base * T0_prop(j);
     r1 = Kp*((Tp/(2*Ti)) -2 *(Td/Tp) -1);
